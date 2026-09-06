@@ -91,6 +91,14 @@ def place_segments(
         raw_trim = g.effective_trim if g is not None else 0.0
         grid_bpm = g.effective_bpm if g is not None else None
         stretch_bpm = grid_bpm if grid_bpm else ti.bpm
+        if grid_bpm and target_bpm:
+            ratio = target_bpm / grid_bpm
+            if ratio < 0.75 or ratio > 1.35:
+                stretch_bpm = ti.bpm
+            else:
+                drift = abs(grid_bpm - target_bpm) / target_bpm
+                if drift > 0.12:
+                    stretch_bpm = ti.bpm
         phrase_aligned = False
         if g is not None and ti.phrase_boundaries_ms and stretch_bpm:
             snapped = snap_trim_to_phrase(raw_trim, ti.phrase_boundaries_ms, stretch_bpm)
