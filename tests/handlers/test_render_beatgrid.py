@@ -83,7 +83,7 @@ async def test_beatgrid_keeps_late_kick_trim_but_clamps_phase(tmp_path, monkeypa
     ]
     monkeypatch.setattr(
         "app.handlers._orchestrator.beatgrid_provider.detect_kick_trim",
-        lambda f, start_s, bpm: (12.3, 130.0),
+        lambda f, start_s, bpm: (12.3, 145.0),
     )
     monkeypatch.setattr(
         "app.handlers._orchestrator.beatgrid_provider.refine_phase",
@@ -98,7 +98,8 @@ async def test_beatgrid_keeps_late_kick_trim_but_clamps_phase(tmp_path, monkeypa
         refresh=True,
     )
     row = res.tracks[0]
+    # long-intro tracks keep their real first-kick trim (no 8 s clamp)
     assert row["trim_start_s"] == 12.3
-    assert row["bpm_measured"] == 130.0
+    assert row["bpm_measured"] == 145.0
     assert abs(row["phase_ms"]) <= 120.0
     assert row["refined_trim_s"] <= row["trim_start_s"] + 0.12

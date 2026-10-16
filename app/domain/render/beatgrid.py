@@ -32,8 +32,6 @@ class BeatgridLimits:
 
 def clamp_entry(entry: BeatgridEntry, limits: BeatgridLimits) -> BeatgridEntry:
     trim = min(entry.trim_start_s, limits.max_trim_start_s)
-    if entry.bpm_measured is None:
-        trim = min(trim, 8.0)
     phase = max(-limits.max_phase_ms, min(limits.max_phase_ms, entry.phase_ms))
     refined = min(
         round(trim + phase / 1000.0, 4),

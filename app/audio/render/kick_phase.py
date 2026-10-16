@@ -67,27 +67,9 @@ def detect_kick_trim(file_path: str, *, start_s: float, bpm: float) -> tuple[flo
         return _fallback_trim(file_path, start_s=start_s, bpm=bpm), bpm
     beat_s = float(np.median(diffs[diffs < 1.3 * med]))
     bpm_measured = 60.0 / beat_s
-    bpm_rounded = _fix_half_time(bpm_measured, bpm)
-    beat_s_clean = 60.0 / bpm_rounded
 
-    anchor = _first_ongrid_kick(kicks, beat_s_clean)
-    return round(anchor, 4), round(bpm_rounded, 4)
-
-
-def _fix_half_time(bpm_measured: float, target_bpm: float) -> int:
-    """Snap measured BPM to an integer that makes musical sense.
-
-    librosa often returns 2x (half-time kick) or 0.5x (double-time kick) values
-    that are technically correct kick intervals but musically wrong. We pick the
-    candidate (rounded, half, double) closest to the target so the grid stays
-    compatible with neighbouring tracks.
-    """
-    if target_bpm <= 0:
-        return round(bpm_measured)
-    candidates = [round(bpm_measured)]
-    for mult in (0.5, 2.0, 1.0 / 3.0, 3.0):
-        candidates.append(round(bpm_measured * mult))
-    return int(min(candidates, key=lambda x: abs(x - target_bpm)))
+    anchor = _first_ongrid_kick(kicks, beat_s)
+    return round(anchor, 4), round(bpm_measured, 4)
 
 
 def _envelope(low: np.ndarray) -> np.ndarray:
@@ -130,7 +112,7 @@ def _fallback_trim(file_path: str, *, start_s: float, bpm: float) -> float:
     y, _ = librosa.load(file_path, sr=_SR, offset=start_s, duration=24.0, mono=True)
     low = sosfiltfilt(sos, y).astype(np.float32)
     env = librosa.onset.onset_strength(y=low, sr=_SR)
-    _raw_bpm, beats = librosa.beat.beat_track(
+    _, beats = librosa.beat.beat_track(
         onset_envelope=env, sr=_SR, start_bpm=bpm, units="time", tightness=140
     )
     beats = np.asarray(beats, dtype=float)

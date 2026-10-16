@@ -20,6 +20,7 @@ dependencies = [
     "numpy>=1.26",
     "python-dotenv>=1.0",
     "mdxnet-infer>=0.1.0",
+    "supabase>=2.0",
     "pyrekordbox>=0.4.4",
 ]
 
@@ -60,7 +61,6 @@ stems = [
 ]
 postgres = ["pgvector>=0.3"]
 supabase = [
-    "supabase>=2.0",
     "pgvector>=0.3",
 ]
 otel = [
@@ -74,6 +74,17 @@ observability = [
     "opentelemetry-sdk>=1.25",
     "opentelemetry-exporter-otlp-proto-http>=1.25",
 ]
+
+
+[tool.uv.sources]
+torch = [
+    { index = "pytorch-cpu", marker = "sys_platform == 'linux'" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
 
 [tool.ruff]
 line-length = 99
