@@ -86,3 +86,13 @@ package-lock.json
 
 # Suno-generated audio assets (export-side artifacts, ~MB each) — never commit.
 suno_out/
+
+# OmO agent state
+.omo/
+
+# Swarm agent state
+.swarm/
+
+# OpenCode local config
+opencode.json
+.opencode/
